@@ -1,0 +1,19 @@
+{
+  "endpoint": "ws://websocket.rentcars.com",
+  "send": "myrequestframe",
+  "timeout": 5,
+  "total_frames": 5,
+  "assert_rate": 30,
+  "validations": [
+    {
+      "type": "regex",
+      "value": "^myexpression"
+    },
+    {
+      "type": "regex",
+      "value": "^anotherexpression"
+    }
+  ],
+  "on_success": [],
+  "on_fail": []
+}

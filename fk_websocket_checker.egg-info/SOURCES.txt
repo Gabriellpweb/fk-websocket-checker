@@ -1,0 +1,9 @@
+setup.cfg
+setup.py
+rc_websocket_checker.egg-info/PKG-INFO
+rc_websocket_checker.egg-info/SOURCES.txt
+rc_websocket_checker.egg-info/dependency_links.txt
+rc_websocket_checker.egg-info/entry_points.txt
+rc_websocket_checker.egg-info/not-zip-safe
+rc_websocket_checker.egg-info/top_level.txt
+rcwebsocketchecker/__init__.py

@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: rc-websocket-checker
+Version: 0.0.1dev-r0
+Summary: Healthcheck for websockets.
+Home-page: UNKNOWN
+Author: Gabriel Pereira
+Author-email: gabriellpweb@gmail.com
+License: MIT
+Description: Validates if websockets endpoints are healthly.
+Keywords: Websocket HealthCheck
+Platform: Linux, Windows, Mac OS

@@ -153,6 +153,7 @@ class SmtpMail(object):
         self.port = options['port']
 
         self.email_from = options['from']
+        #self.email_to = ", ".join(options['to'])
         self.email_to = options['to']
 
         self.username = options['username']
@@ -160,37 +161,28 @@ class SmtpMail(object):
         self.password = options['password']
 
         self.subject = options['subject']
-        self.email_from = options['from']
-
-        if isinstance(options['to'], list):
-            self.email_to = ", ".join(options['to'])
-        else:
-            self.email_to = options['to']
 
         if 'tls' in options:
             self.tls = options['tls']
 
-        if 'port' not in options:
-            self.instance = smtplib.SMTP(self.host)
-        else:
-            self.instance = smtplib.SMTP(self.host, str(self.port))
-
     def send(self, message):
 
         try:
+
+            self.instance = smtplib.SMTP(self.host, str(self.port))
+            self.instance.ehlo()
+            self.instance.login(self.username, self.password)
             if self.tls:
                 self.instance.starttls()
-
-            self.instance.login(self.username, self.password)
 
             msg = MIMEMultipart('alternative')
             msg['Subject'] = self.subject
             msg['From'] = self.email_from
-            msg['To'] = self.email_to
+            msg['To'] = ", ".join(self.email_to)
             msg.attach(MIMEText(message, 'html'))
 
             self.instance.sendmail(self.email_from, self.email_to, msg.as_string())
-            self.instance.close()
+            self.instance.quit()
 
         except Exception, e:
             print '### ERROR :: ' + e.message + ' ### '

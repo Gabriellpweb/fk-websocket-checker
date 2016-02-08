@@ -1,5 +1,12 @@
-import websocket
+# coding=utf-8
+
 import re
+import websocket
+import smtplib
+import fklayouts
+
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 
 class FkChecker(object):
@@ -69,10 +76,44 @@ class FkChecker(object):
     def on_success(self):
         print "Test passed!"
         # TODO: Develop the callers for success event
+        if 'on_success' in self.options and len(self.options['on_success']) > 0:
+            for action in self.options['on_success']:
+                if action['type'] == 'mail' and 'smtp' in self.options:
+                    self.fire_email('success')
 
     def on_fail(self):
         print "Test failed!"
+        # i'm a cow boy on my steel horse i ride! xD
         # TODO: Develop the callers for fail event
+        if 'on_fail' in self.options and len(self.options['on_fail']) > 0:
+            for action in self.options['on_fail']:
+                if action['type'] == 'mail' and 'smtp' in self.options:
+                    self.fire_email('fail')
+
+                elif action['type'] == 'shell':
+                    #TODO: implement shell code action for FAIL
+                    pass
+
+    def get_tags(self):
+        return {
+            '{ENDPOINT}': self.endpoint,
+            '{TOTAL_FRAMES}': str(self.get_recv_frames),
+            '{TOTAL_ASSERTS}': str(self.get_asserts),
+            '{TOTAL_VALIDATIONS}': str(self.get_validations_runned),
+            '{ASSERT_RATE}': str(self.get_assert_rate),
+        }
+
+    def fire_email(self, event):
+        if 'fail' == event:
+            self.options['smtp']['subject'] = '[WS/FAIL] Websocket (' + self.endpoint + ') fail'
+            message = fklayouts.get_layout('FAIL', self.get_tags())
+
+        elif 'success' == event:
+            self.options['smtp']['subject'] = '[WS/SUCCESS] Websocket (' + self.endpoint + ') succeded'
+            message = fklayouts.get_layout('SUCCESS', self.get_tags())
+
+        smtp_mail = SmtpMail(self.options['smtp'])
+        smtp_mail.send(message)
 
     @property
     def get_asserts(self):
@@ -89,3 +130,70 @@ class FkChecker(object):
     @property
     def get_validations_runned(self):
         return len(self.options['validations']) * len(self.frames)
+
+
+class SmtpMail(object):
+
+    host = ''
+    port = ''
+    username = ''
+    password = ''
+    instance = None
+    tls = False
+
+    options = []
+    subject = ''
+    email_from = ''
+    email_to = ''
+    message = ''
+
+    def __init__(self, options):
+
+        self.host = options['host']
+        self.port = options['port']
+
+        self.email_from = options['from']
+        self.email_to = options['to']
+
+        self.username = options['username']
+
+        self.password = options['password']
+
+        self.subject = options['subject']
+        self.email_from = options['from']
+
+        if isinstance(options['to'], list):
+            self.email_to = ", ".join(options['to'])
+        else:
+            self.email_to = options['to']
+
+        if 'tls' in options:
+            self.tls = options['tls']
+
+        if 'port' not in options:
+            self.instance = smtplib.SMTP(self.host)
+        else:
+            self.instance = smtplib.SMTP(self.host, str(self.port))
+
+    def send(self, message):
+
+        try:
+            if self.tls:
+                self.instance.starttls()
+
+            self.instance.login(self.username, self.password)
+
+            msg = MIMEMultipart('alternative')
+            msg['Subject'] = self.subject
+            msg['From'] = self.email_from
+            msg['To'] = self.email_to
+            msg.attach(MIMEText(message, 'html'))
+
+            self.instance.sendmail(self.email_from, self.email_to, msg.as_string())
+            self.instance.close()
+
+        except Exception, e:
+            print '### ERROR :: ' + e.message + ' ### '
+        finally:
+            print '### MAIL SENT... ###'
+

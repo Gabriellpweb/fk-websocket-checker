@@ -1,19 +1,37 @@
 {
-  "endpoint": "ws://websocket.rentcars.com",
-  "send": "myrequestframe",
+  "endpoint": "ws://mywebsocket.endpoint",
+  "send": "myrequestforwebsocket",
   "timeout": 5,
   "total_frames": 5,
   "assert_rate": 30,
   "validations": [
     {
       "type": "regex",
-      "value": "^myexpression"
+      "value": "^Connected"
     },
     {
       "type": "regex",
-      "value": "^anotherexpression"
+      "value": "^myexpression"
     }
   ],
-  "on_success": [],
-  "on_fail": []
+  "on_success": [
+    {
+      "type": "mail"
+    }
+  ],
+  "on_fail": [
+    {
+      "type": "mail"
+    }
+  ],
+  "smtp": {
+    "host": "smtp.mymail.com",
+    "port": "587",
+    "username": "myuser@mail.com",
+    "password": "mailpassword",
+    "from": "devops@mail.com",
+    "to": [
+      "receiver@mail.com"
+    ]
+  }
 }

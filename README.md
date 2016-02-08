@@ -1,2 +1,2 @@
 # fkwebsocketchecker
-Validates if websockets endpoints are healthly."""
+Validates if websocket endpoint are healthy according with json file rules.

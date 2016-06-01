@@ -4,7 +4,7 @@ import re
 import websocket
 import smtplib
 import fklayouts
-from httplib import HTTPConnection
+import requests
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -204,9 +204,6 @@ class DeadManSnitch(object):
 
     def notify(self):
         if self.snitchUrl <> '':
-            httpConnection = HTTPConnection(self.snitchUrl)
-            httpConnection.request('GET','/')
-            response = httpConnection.getresponse()
-            response.close()
+            res = requests.get(self.snitchUrl)
         pass
 

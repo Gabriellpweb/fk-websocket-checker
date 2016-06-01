@@ -2,6 +2,7 @@
   "endpoint": "ws://mywebsocket.endpoint",
   "send": "myrequestforwebsocket",
   "timeout": 5,
+  "snitch_url": "deadmansnitch URL",
   "total_frames": 5,
   "assert_rate": 30,
   "validations": [

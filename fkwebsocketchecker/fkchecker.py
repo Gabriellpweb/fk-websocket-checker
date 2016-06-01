@@ -4,6 +4,7 @@ import re
 import websocket
 import smtplib
 import fklayouts
+from httplib import HTTPConnection
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -32,6 +33,11 @@ class FkChecker(object):
                                          on_close=self.on_close)
 
         self.ws.on_open = self.on_open
+
+        # deadmansnitch notify
+        if 'snitch_url' in self.options:
+            dms = DeadManSnitch(self.options['snitch_url'])
+            dms.notify()
 
         print "### Starting... ###"
         self.ws.run_forever()
@@ -188,4 +194,19 @@ class SmtpMail(object):
             print '### ERROR :: ' + e.message + ' ### '
         finally:
             print '### MAIL SENT... ###'
+
+class DeadManSnitch(object):
+
+    snitchUrl = ''
+
+    def __init__(self, snitchUrl):
+        self.snitchUrl = snitchUrl
+
+    def notify(self):
+        if self.snitchUrl <> '':
+            httpConnection = HTTPConnection(self.snitchUrl)
+            httpConnection.request('GET','/')
+            response = httpConnection.getresponse()
+            response.close()
+        pass
 
